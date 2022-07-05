@@ -5,14 +5,29 @@ metadata:
 spec:
   containers:
   - name: liveness
-    image: k8s.gcr.io/liveness
+    image: brainupgrade/tshoot
+    command:
+    - /bin/sh
     args:
-    - /server
+    - -c
+    - while true; do touch /tmp/healthy;sleep 30; rm -rf /tmp/healthy;sleep 10;touch /tmp/healthy;done
     livenessProbe:
-      httpGet:
-        path: /liveness
-        port: 8080
-      failureThreshold: 1
-      successThreshold: 1
-      periodSeconds: 60
+      exec:
+        command:
+        - cat
+        - /tmp/healthy
       initialDelaySeconds: 0
+      periodSeconds: 1
+      successThreshold: 1
+      failureThreshold: 5
+    readinessProbe:
+      exec:
+        command:
+        - cat
+        - /tmp/healthy
+      initialDelaySeconds: 0
+      periodSeconds: 1
+      successThreshold: 1
+      failureThreshold: 1
+# kubectl get events --sort-by='.metadata.creationTimestamp' -A
+# k get events  --sort-by='.lastTimestamp'
